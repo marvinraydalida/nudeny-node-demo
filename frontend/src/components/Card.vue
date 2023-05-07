@@ -32,7 +32,6 @@ export default{
     width: 95%;
     height: 70%;
     margin: auto;
-    border: 1px solid yellow;
 }
 
 .image-container img{

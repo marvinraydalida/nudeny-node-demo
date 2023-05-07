@@ -21,11 +21,29 @@ app.post('/upload', upload.single('files'), async (req, res) => {
     const formData = new FormData()
     formData.append(req.file.fieldname, req.file.buffer, req.file.originalname)
 
-    const result = await nudeny.classifyMultiPartForm(formData)
-    console.log(result.data)
+    // const result = await nudeny.classifyMultiPartForm(formData)
+    // console.log(result.data)
 
-    const classification = result.data.Prediction[0].class;
-    if (classification === 'safe') {
+    // const classification = result.data.Prediction[0].class;
+    // if (classification === 'safe') {
+    //     const destinationPath = `uploads/${req.file.originalname}`;
+    //     fs.writeFileSync(destinationPath, req.file.buffer);
+    //     db.push({
+    //         'title': req.body.title,
+    //         'url': baseUrl + `/${req.file.originalname}`
+    //     })
+    //     res.status(200).json(db)
+    // }
+    // else {
+    //     res.status(422).json({
+    //         "status": classification,
+    //     })
+    // }
+
+    const result = await nudeny.censorMultiPartForm(formData)
+    console.log(result.data.Prediction[0].url)
+
+    if(result.data.Prediction[0].url === ''){
         const destinationPath = `uploads/${req.file.originalname}`;
         fs.writeFileSync(destinationPath, req.file.buffer);
         db.push({
@@ -35,9 +53,11 @@ app.post('/upload', upload.single('files'), async (req, res) => {
         res.status(200).json(db)
     }
     else {
-        res.status(422).json({
-            "status": classification,
+        db.push({
+            'title': req.body.title,
+            'url': result.data.Prediction[0].url
         })
+        res.status(200).json(db)
     }
 })
 
